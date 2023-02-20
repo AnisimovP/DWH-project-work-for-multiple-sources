@@ -70,4 +70,12 @@ select
 			courier_order_sum,
 			courier_reward_sum
 from all_courier_info
-order by courier_name;
+order by courier_name
+ON CONFLICT (courier_id, settlement_year, settlement_month) DO UPDATE 
+SET orders_count = excluded.orders_count,
+    orders_total_sum = excluded.orders_total_sum,
+    rate_avg = excluded.rate_avg,
+    order_processing_fee = excluded.order_processing_fee,
+    courier_order_sum = excluded.courier_order_sum,
+    courier_tips_sum = excluded.courier_tips_sum,
+    courier_reward_sum = excluded.courier_reward_sum;

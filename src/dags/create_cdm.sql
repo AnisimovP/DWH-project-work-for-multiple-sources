@@ -2,7 +2,7 @@ drop table if exists cdm.dm_courier_ledger cascade;
 
 create table cdm.dm_courier_ledger (
 	id int4 NOT NULL GENERATED ALWAYS AS identity primary key,
-	courier_id varchar NOT null,
+	courier_id varchar NOT null, 
 	courier_name varchar NOT null,
 	settlement_year int NOT null,
 	settlement_month int NOT null,
@@ -20,6 +20,7 @@ create table cdm.dm_courier_ledger (
 	CONSTRAINT dm_courier_ledger_order_processing_fee_check CHECK ((order_processing_fee >= (0)::numeric)),
 	CONSTRAINT dm_courier_ledger_courier_order_sum_check CHECK ((courier_order_sum >= (0)::numeric)),
 	CONSTRAINT dm_courier_ledger_courier_tips_sum_check CHECK ((courier_tips_sum >= (0)::numeric)),
-	CONSTRAINT dm_courier_ledger_courier_reward_sum_check CHECK ((courier_reward_sum >= (0)::numeric))
+	CONSTRAINT dm_courier_ledger_courier_reward_sum_check CHECK ((courier_reward_sum >= (0)::numeric)),
+	CONSTRAINT dm_courier_ledger_unique UNIQUE (courier_id, settlement_year, settlement_month)
 );
 

@@ -13,14 +13,15 @@ from airflow.utils.task_group import TaskGroup
 task_logger = logging.getLogger('airflow.task')
 
 # подключение к ресурсам
+api_conn = BaseHook.get_connection('api_connection')
 postgres_conn = 'PG_WAREHOUSE_CONNECTION'
 dwh_hook = PostgresHook(postgres_conn)
 
 # параметры API
-nickname = "Anisimovp95"
-cohort = '8'
-api_key = "25c27781-8fde-4b30-a22e-524044a7580f"
-base_url = 'd5d04q7d963eapoepsqr.apigw.yandexcloud.net'
+nickname = json.loads(api_conn.extra)['nickname']
+cohort = json.loads(api_conn.extra)['cohort']
+api_key = json.loads(api_conn.extra)['api_key']
+base_url = api_conn.host
 
 headers = {"X-Nickname": nickname,
            'X-Cohort': cohort,
@@ -100,7 +101,7 @@ default_args = {
 dag = DAG('dag_project',
           start_date=datetime.today() - timedelta(days=7),
           catchup=True,
-          schedule_interval='5 6 * * 1',
+          schedule_interval='@daily',
           max_active_runs=1,
           default_args=default_args)
 
@@ -109,7 +110,7 @@ with TaskGroup(group_id='upload_stg', dag=dag) as upload_stg:
         task_id='stg_deliveries',
         python_callable=upload_deliveries,
         op_kwargs={
-            'start_date': '{{ macros.ds_add(ds, -7) }}',
+            'start_date': '{{yesterday_ds}}',
             'end_date': '{{ds}}'
         },
         dag=dag

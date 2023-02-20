@@ -1,6 +1,3 @@
-DELETE FROM dds.fct_deliveries
-WHERE order_ts::date BETWEEN '{{yesterday_ds}}' AND '{{ds}}';
-
 INSERT INTO dds.fct_deliveries
 (order_id, order_ts, delivery_id, courier_id, address, delivery_ts, rate, sum, tip_sum)
 SELECT 
@@ -23,4 +20,11 @@ JOIN
 		ON sd.delivery_id = dd.delivery_id
 JOIN 
 	dds.dm_couriers AS dc 
-		ON sd.courier_id = dc.courier_id;
+		ON sd.courier_id = dc.courier_id
+ON CONFLICT (order_id) DO UPDATE SET
+    order_ts = excluded.order_ts,
+    address = excluded.address,
+    delivery_ts = excluded.delivery_ts,
+    rate = excluded.rate,
+    sum = excluded.sum,
+    tip_sum = excluded.tip_sum;

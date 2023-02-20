@@ -24,7 +24,7 @@ drop table if exists dds.fct_deliveries cascade;
 
 create table dds.fct_deliveries (
 id serial NOT null primary key,
-order_id int4 NOT null,
+order_id int4 NOT null unique,
 order_ts timestamp NOT null,
 delivery_id int4 NOT null,
 courier_id int4 NOT null,
